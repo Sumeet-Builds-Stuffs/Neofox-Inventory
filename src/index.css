@@ -1,0 +1,106 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6f8;
+  color: #222;
+}
+
+.dashboard-wrapper {
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  flex: 1;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: scale(1.02);
+}
+
+.stat-card p:first-child {
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+
+.stat-card p:last-child {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.main-content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.user-card {
+  background: white;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-2px);
+}
+
+.user-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.user-card-header img {
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+}
+
+.user-card-header div {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.item-count {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.user-log-list {
+  margin-top: 1rem;
+  padding-left: 1.5rem;
+}
+
+.user-log-list li {
+  font-size: 0.95rem;
+  padding: 0.4rem 0;
+}
+
+.user-log-item strong {
+  color: #222;
+}
