@@ -108,14 +108,14 @@ body {
 .dashboard-header {
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* ⛔️ Don't let it wrap! */
+  overflow-x: auto;  /* ✅ Allow horizontal scrolling */
   gap: 1rem;
+  padding-bottom: 0.5rem;
 }
 
 .stat-card {
-  flex: 0 0 calc(33.33% - 0.75rem); 
-  min-width: 100px;
-  max-width: 32%;
+  flex: 0 0 120px; /* ✅ Fixed width to fit 3 in one row-ish */
   background: white;
   padding: 1rem;
   border-radius: 14px;
