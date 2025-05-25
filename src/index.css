@@ -107,13 +107,16 @@ body {
 
 /* 🌐 Stat cards in a row even on mobile */
 .dashboard-header {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 2rem;
 }
 
 .stat-card {
+  flex: 0 0 calc(33.33% - 0.75rem); /* force 3 per row */
+  min-width: 100px;
+  max-width: 32%;
   background: white;
   padding: 1rem;
   border-radius: 14px;
