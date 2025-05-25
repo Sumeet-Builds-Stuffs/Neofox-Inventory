@@ -105,7 +105,6 @@ body {
   color: #222;
 }
 
-/* 🌐 Stat cards in a row even on mobile */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -114,7 +113,7 @@ body {
 }
 
 .stat-card {
-  flex: 0 0 calc(33.33% - 0.75rem); /* force 3 per row */
+  flex: 0 0 calc(33.33% - 0.75rem); 
   min-width: 100px;
   max-width: 32%;
   background: white;
@@ -123,4 +122,3 @@ body {
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
-//
