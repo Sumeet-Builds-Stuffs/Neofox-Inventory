@@ -1,155 +1,86 @@
 import { useEffect, useState } from 'react';
-import { Home, Package, Repeat, Users, Settings, PlusCircle, Box, DoorOpen, FileText } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
 export default function App() {
-  const [logs, setLogs] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [groupedLogs, setGroupedLogs] = useState({});
-  const [expandedUser, setExpandedUser] = useState(null);
 
   useEffect(() => {
-    const fetchLogs = async () => {
+    const fetchItems = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from('logs')
+        .from('items')
         .select('*')
-        .order('timestamp', { ascending: false });
+        .order('item_name', { ascending: true });
 
       if (data) {
-        setLogs(data);
-        groupByUser(data);
+        setItems(data);
+      } else {
+        console.error('Error fetching items:', error);
       }
       setLoading(false);
     };
 
-    fetchLogs();
-
-    const channel = supabase
-      .channel('realtime:logs')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'logs',
-        },
-        (payload) => {
-          if (payload.new) {
-            setLogs((prev) => {
-              const updated = [payload.new, ...prev];
-              groupByUser(updated);
-              return updated;
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    fetchItems();
   }, []);
 
-  const groupByUser = (logs) => {
-    const latestByItem = new Map();
-    logs.forEach(log => {
-      if (!latestByItem.has(log.uid)) {
-        latestByItem.set(log.uid, log);
-      }
-    });
-
-    const grouped = {};
-    for (let log of latestByItem.values()) {
-      if (log.action === 'Check Out') {
-        if (!grouped[log.user_name]) grouped[log.user_name] = [];
-        grouped[log.user_name].push(log);
-      }
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Available': return '#22c55e';
+      case 'Checked Out': return '#f97316';
+      case 'Damaged': return '#ef4444';
+      default: return '#6b7280';
     }
-    setGroupedLogs(grouped);
-  };
-
-  const itemsInOffice = logs.filter(log => log.action === 'Check In').length;
-  const itemsOutOfOffice = logs.filter(log => log.action === 'Check Out').length;
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "Invalid Date";
-    return date.toLocaleString();
   };
 
   return (
     <div className="dashboard-wrapper" style={{ backgroundColor: '#f4f6f8', minHeight: '100vh', padding: '2rem', fontFamily: 'Segoe UI, sans-serif' }}>
-      <header className="dashboard-header" style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
-        <StatCard title="Items in Office" value={itemsInOffice} icon={<Box size={20} />} />
-        <StatCard title="Items Checked Out" value={itemsOutOfOffice} icon={<DoorOpen size={20} />} />
-        <StatCard title="Total Logs" value={logs.length} icon={<FileText size={20} />} />
+      <header className="dashboard-header" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+        <StatCard title="Total Items" value={items.length} />
+        <StatCard title="Available" value={items.filter(i => i.status === 'Available').length} />
+        <StatCard title="Checked Out" value={items.filter(i => i.status === 'Checked Out').length} />
       </header>
 
       <main className="main-content" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: '600', marginBottom: '1.25rem' }}>Checked Out Items by User</h2>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: '600', marginBottom: '1.25rem' }}>Gear Overview</h2>
 
-        {Object.entries(groupedLogs).length === 0 && (
-          <div style={{ fontSize: '1rem', color: '#888' }}>No items currently checked out.</div>
-        )}
-
-        <div style={{ display: 'grid', gap: '1rem' }}>
-          {Object.entries(groupedLogs).map(([user, userLogs]) => (
-            <div className="user-card" key={user} style={{ background: '#fff', borderRadius: '14px', padding: '1.25rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', transition: 'all 0.3s ease' }}>
-              <div
-                className="user-card-header"
-                onClick={() => setExpandedUser(expandedUser === user ? null : user)}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user)}&background=random&color=fff`}
-                    alt={user}
-                    className="user-avatar"
-                    style={{ width: '42px', height: '42px', borderRadius: '50%' }}
-                  />
-                  <div style={{ fontWeight: '600', fontSize: '1rem' }}>{user}</div>
-                </div>
-                <span className="item-count" style={{ fontSize: '0.9rem', color: '#555' }}>{userLogs.length} item(s)</span>
+        {loading ? (
+          <p>Loading items...</p>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
+            {items.map(item => (
+              <div key={item.uid} className="gear-card" style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {item.image_url && (
+                  <img src={item.image_url} alt={item.item_name} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px' }} />
+                )}
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '600', margin: 0 }}>{item.item_name}</h3>
+                <span style={{ fontSize: '0.9rem', color: '#666' }}>{item.category}</span>
+                <span style={{ fontSize: '0.85rem', backgroundColor: getStatusColor(item.status), color: '#fff', padding: '0.25rem 0.5rem', borderRadius: '6px', width: 'fit-content' }}>{item.status}</span>
+                {item.due_date && (
+                  <span style={{ fontSize: '0.85rem', color: '#ef4444' }}>Due: {new Date(item.due_date).toLocaleDateString()}</span>
+                )}
               </div>
-
-              {expandedUser === user && (
-                <ul className="user-log-list" style={{ marginTop: '1rem', paddingLeft: '1.5rem', listStyle: 'none' }}>
-                  {userLogs.map((log) => (
-                    <li key={log.id} className="user-log-item" style={{ padding: '0.4rem 0', display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontWeight: '600', fontSize: '1rem' }}>🎒 {log.item_name}</span>
-                      <span style={{ fontSize: '0.85rem', color: '#666' }}>{log.uid} • {formatDate(log.timestamp)}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
 }
 
-const StatCard = ({ title, value, icon }) => (
+const StatCard = ({ title, value }) => (
   <div
     className="stat-card"
     style={{
       flex: '1',
       background: '#fff',
-      padding: '1.25rem',
+      padding: '1rem',
       borderRadius: '14px',
-      textAlign: 'left',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.25rem'
+      textAlign: 'center',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
     }}
   >
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.95rem', color: '#666' }}>
-      {icon}
-      {title}
-    </div>
-    <div style={{ fontSize: '1.75rem', fontWeight: 'bold', marginTop: '0.25rem' }}>{value}</div>
+    <p style={{ margin: 0, fontSize: '0.9rem', color: '#555' }}>{title}</p>
+    <p style={{ margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>{value}</p>
   </div>
 );
