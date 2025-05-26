@@ -27,9 +27,9 @@ export default function App() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Available': return '#FAB12F';
-      case 'Checked Out': return '#FA812F';
-      case 'Damaged': return '#FA4032';
+      case 'Available': return '#4CAF50'; // Green
+      case 'Checked Out': return '#FAB12F'; // Sunset Orange
+      case 'Damaged': return '#FA4032'; // Red
       default: return '#6b7280';
     }
   };
@@ -45,14 +45,34 @@ export default function App() {
   const overdueCount = items.filter(i => isOverdue(i.due_date)).length;
 
   return (
-    <div className="dashboard-wrapper" style={{ background: 'linear-gradient(to bottom, #FEF3E2, #ffffff)', minHeight: '100vh', padding: '2rem', fontFamily: 'Segoe UI, sans-serif' }}>
+    <div className="dashboard-wrapper" style={{
+      background: 'linear-gradient(to bottom, #FEF3E2, #ffffff)',
+      minHeight: '100vh',
+      padding: '2rem',
+      fontFamily: 'Segoe UI, sans-serif'
+    }}>
+
       {overdueCount > 0 && (
-        <div style={{ backgroundColor: '#FA4032', color: '#fff', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 'bold' }}>
+        <div style={{
+          backgroundColor: '#FA4032',
+          color: '#fff',
+          padding: '1rem',
+          borderRadius: '12px',
+          marginBottom: '1.5rem',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+        }}>
           ⚠️ {overdueCount} item{overdueCount > 1 ? 's are' : ' is'} overdue! Return them ASAP.
         </div>
       )}
 
-      <header className="dashboard-header" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+      <header className="dashboard-header" style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '1rem',
+        marginBottom: '2rem'
+      }}>
         <StatCard title="Total Items" value={items.length} />
         <StatCard title="Available" value={items.filter(i => i.status === 'Available').length} />
         <StatCard title="Checked Out" value={items.filter(i => i.status === 'Checked Out').length} />
@@ -64,7 +84,13 @@ export default function App() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search items..."
-          style={{ width: '100%', padding: '0.75rem 1rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid #ccc' }}
+          style={{
+            width: '100%',
+            padding: '0.75rem 1rem',
+            fontSize: '1rem',
+            borderRadius: '8px',
+            border: '1px solid #ccc'
+          }}
         />
       </div>
 
@@ -74,34 +100,64 @@ export default function App() {
         {loading ? (
           <p>Loading items...</p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '1.5rem'
+          }}>
             {filteredItems.map(item => (
               <div
                 key={item.uid}
                 className="gear-card"
                 style={{
-                  background: '#FEF3E2',
-                  borderRadius: '16px',
-                  boxShadow: '0 6px 16px rgba(250, 129, 47, 0.1)',
+                  background: '#FA812F',
+                  borderRadius: '20px',
+                  boxShadow: '0 6px 16px rgba(0,0,0,0.08)',
                   padding: '1.25rem',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '0.75rem',
+                  color: '#fff',
                   transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                  cursor: 'pointer',
+                  cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
                 {item.image_url && (
-                  <img src={item.image_url} alt={item.item_name} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '10px' }} />
+                  <img
+                    src={item.image_url}
+                    alt={item.item_name}
+                    style={{
+                      width: '100%',
+                      height: '150px',
+                      objectFit: 'cover',
+                      borderRadius: '10px'
+                    }}
+                  />
                 )}
                 <h3 style={{ fontSize: '1.15rem', fontWeight: '600', margin: 0 }}>{item.item_name}</h3>
-                <span style={{ fontSize: '0.95rem', color: '#555' }}>{item.category}</span>
-                <span style={{ fontSize: '0.85rem', backgroundColor: getStatusColor(item.status), color: '#fff', padding: '0.25rem 0.6rem', borderRadius: '6px', width: 'fit-content' }}>{item.status}</span>
+                <span style={{ fontSize: '0.95rem', opacity: 0.9 }}>{item.category}</span>
+                <span style={{
+                  fontSize: '0.85rem',
+                  backgroundColor: getStatusColor(item.status),
+                  color: '#fff',
+                  padding: '0.25rem 0.6rem',
+                  borderRadius: '6px',
+                  width: 'fit-content',
+                  fontWeight: 'bold'
+                }}>{item.status}</span>
                 {item.due_date && (
-                  <span style={{ fontSize: '0.85rem', color: isOverdue(item.due_date) ? '#FA4032' : '#6b7280' }}>
-                    {isOverdue(item.due_date) ? '⚠️ Overdue: ' : 'Due: '} {new Date(item.due_date).toLocaleDateString()}
+                  <span style={{
+                    fontSize: '0.85rem',
+                    color: isOverdue(item.due_date) ? '#fff' : '#fefefe',
+                    backgroundColor: isOverdue(item.due_date) ? '#FA4032' : '#00000033',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontWeight: '500'
+                  }}>
+                    {isOverdue(item.due_date) ? '⚠️ Overdue: ' : 'Due: '}
+                    {new Date(item.due_date).toLocaleDateString()}
                   </span>
                 )}
               </div>
@@ -114,17 +170,14 @@ export default function App() {
 }
 
 const StatCard = ({ title, value }) => (
-  <div
-    className="stat-card"
-    style={{
-      flex: '1',
-      background: '#fff',
-      padding: '1rem',
-      borderRadius: '14px',
-      textAlign: 'center',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
-    }}
-  >
+  <div className="stat-card" style={{
+    flex: '1',
+    background: '#fff',
+    padding: '1rem',
+    borderRadius: '14px',
+    textAlign: 'center',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+  }}>
     <p style={{ margin: 0, fontSize: '0.9rem', color: '#555' }}>{title}</p>
     <p style={{ margin: 0, fontSize: '1.75rem', fontWeight: 'bold' }}>{value}</p>
   </div>
