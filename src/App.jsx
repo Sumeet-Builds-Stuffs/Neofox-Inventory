@@ -34,16 +34,24 @@ export default function App() {
     }
   };
 
-  const filteredItems = items.filter(item =>
-    item.item_name.toLowerCase().includes(search.toLowerCase())
-  );
-
   const isOverdue = (dueDate) => {
     return dueDate && new Date(dueDate) < new Date();
   };
 
+  const filteredItems = items.filter(item =>
+    item.item_name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const overdueCount = items.filter(i => isOverdue(i.due_date)).length;
+
   return (
-    <div className="dashboard-wrapper" style={{ backgroundColor: '#f4f6f8', minHeight: '100vh', padding: '2rem', fontFamily: 'Segoe UI, sans-serif' }}>
+    <div className="dashboard-wrapper" style={{ backgroundColor: '#f9fafb', minHeight: '100vh', padding: '2rem', fontFamily: 'Segoe UI, sans-serif' }}>
+      {overdueCount > 0 && (
+        <div style={{ backgroundColor: '#fee2e2', color: '#b91c1c', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 'bold' }}>
+          ⚠️ {overdueCount} item{overdueCount > 1 ? 's are' : ' is'} overdue! Return them ASAP.
+        </div>
+      )}
+
       <header className="dashboard-header" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <StatCard title="Total Items" value={items.length} />
         <StatCard title="Available" value={items.filter(i => i.status === 'Available').length} />
@@ -68,7 +76,24 @@ export default function App() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
             {filteredItems.map(item => (
-              <div key={item.uid} className="gear-card" style={{ background: '#fff', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', transition: 'transform 0.2s', cursor: 'pointer' }}>
+              <div
+                key={item.uid}
+                className="gear-card"
+                style={{
+                  background: '#ffffffcc',
+                  borderRadius: '16px',
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.06)',
+                  padding: '1.25rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.75rem',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(6px)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
                 {item.image_url && (
                   <img src={item.image_url} alt={item.item_name} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '10px' }} />
                 )}
