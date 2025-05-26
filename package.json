@@ -4,12 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "tailwind-init": "tailwindcss init -p"
-  },
+  "dev": "vite",
+  "build": "vite build",
+  "postinstall": "chmod +x node_modules/.bin/vite",
+  "preview": "vite preview"
+},
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",
     "@tailwindcss/forms": "^0.5.10",
